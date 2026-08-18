@@ -82,6 +82,15 @@ jobs:
           name: ${{ inputs.artifactname }}
           path: ${{ inputs.artifactname }}.zip 
 
+  test-job:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Run docker action
+        uses: docker://alpine:latest
+        with:   
+          args: echo "Running tests in a Docker container"
+
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
