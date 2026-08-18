@@ -62,3 +62,15 @@ jobs:
         run: |
           Compress-Archive -Path ./publish/* -DestinationPath ${{ inputs.artifactname }}.zip
         shell: pwsh  
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.artifactname }}     
