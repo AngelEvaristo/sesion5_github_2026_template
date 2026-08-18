@@ -72,7 +72,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.artifactname }}    
+          name: ${{ inputs.artifactname }}
+          path: ${{ inputs.artifactname }}.zip 
 
   deploy:
     runs-on: ubuntu-latest
