@@ -31,6 +31,10 @@ on:
         description: 'AWS OIDC Role ARN'
         required: true       
 
+env:
+  LAMBDA_HEADER: 'sesion5_github_2026::sesion5_github_2026_Function::FunctionHandler'
+  LAMBDA_RUNTIME: 'dotnet8'
+
 jobs:
   extract-version:
     runs-on: ubuntu-latest
@@ -110,7 +114,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifactname }}  
-          
+
       - name: Mostrar variable
         run: echo "version en ${{ vars.VARIABLE_GITHUB }} | artifact name ${{ inputs.artifactname }} | webapp name ${{ vars.WEBAPP_NAME }} | environment ${{ inputs.environment }}"
 
@@ -124,3 +128,32 @@ jobs:
         with:
           app-name: ${{ vars.WEBAPP_NAME }}
           package: ${{ inputs.artifactname }}.zip
+
+  deploy-aws:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    needs: build
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifactname }}  
+
+      - name: Mostrar variable
+        run: echo "version en ${{ vars.VARIABLE_GITHUB }} | artifact name ${{ inputs.artifactname }} | lambda name ${{ vars.LAMBDA_NAME }} | environment ${{ inputs.environment }}"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.OIDC_AWS_ARN }}
+          aws-region: us-east-1
+          
+      - name: deploy lambda
+        run: |
+          aws lambda update-function-configuration --function-name ${{ vars.LAMBDA_NAME }} --handler ${{ env.LAMBDA_HEADER }} --runtime ${{ env.LAMBDA_RUNTIME }}
+          aws lambda wait function-updated --function-name ${{ vars.LAMBDA_NAME }}
+          aws lambda update-function-code --function-name ${{ vars.LAMBDA_NAME }} --zip-file fileb://${{ inputs.artifactname }}.zip --publish            
+          aws lambda wait function-updated --function-name ${{ vars.LAMBDA_NAME }}   
+
