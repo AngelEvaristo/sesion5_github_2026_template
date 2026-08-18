@@ -30,9 +30,7 @@ on:
       OIDC_AWS_ARN:
         description: 'AWS OIDC Role ARN'
         required: true       
-permissions:
-  id-token: write
-  
+
 env:
   LAMBDA_HEADER: 'sesion5_github_2026::sesion5_github_2026_Function::FunctionHandler'
   LAMBDA_RUNTIME: 'dotnet8'
