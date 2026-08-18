@@ -22,7 +22,14 @@ on:
         description: 'Environment to deploy'
         required: false
         default: 'produccion'
-        type: string  
+        type: string
+    secrets:
+      SERVICE_PRINCIPAL:
+        description: 'Azure Service Principal'
+        required: true
+      OIDC_AWS_ARN:
+        description: 'AWS OIDC Role ARN'
+        required: true       
 
 jobs:
   extract-version:
@@ -91,7 +98,7 @@ jobs:
         with:   
           args: echo "Running tests in a Docker container"
 
-  deploy:
+  deploy-azure:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     needs: build
@@ -103,5 +110,17 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifactname }}  
+          
       - name: Mostrar variable
-        run: echo "version en ${{ vars.VARIABLE_GITHUB }}"
+        run: echo "version en ${{ vars.VARIABLE_GITHUB }} | artifact name ${{ inputs.artifactname }} | webapp name ${{ vars.WEBAPP_NAME }} | environment ${{ inputs.environment }}"
+
+      - name: azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.SERVICE_PRINCIPAL }}  
+
+      - name: deploy web app
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ vars.WEBAPP_NAME }}
+          package: ${{ inputs.artifactname }}.zip
