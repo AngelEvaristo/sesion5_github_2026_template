@@ -54,3 +54,11 @@ jobs:
 
       - name: build
         run: dotnet build --no-restore --configuration ${{ inputs.buildconfiguration }}
+      
+      - name: publish
+        run: dotnet publish --no-restore --configuration ${{ inputs.buildconfiguration }} --output ./publish
+    
+      - name: zip artifact
+        run: |
+          Compress-Archive -Path ./publish/* -DestinationPath ${{ inputs.artifactname }}.zip
+        shell: pwsh  
