@@ -69,16 +69,18 @@ jobs:
           Compress-Archive -Path ./publish/* -DestinationPath ${{ inputs.artifactname }}.zip
         shell: pwsh  
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifactname }}    
+
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     needs: build
+    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ inputs.artifactname }}
       - name: Mostrar variable
         run: echo "version en ${{ vars.VARIABLE_GITHUB }}"
