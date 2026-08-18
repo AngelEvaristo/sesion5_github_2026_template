@@ -82,7 +82,7 @@ jobs:
           name: ${{ inputs.artifactname }}
           path: ${{ inputs.artifactname }}.zip 
 
-  test-job:
+  test-job-docker:
     runs-on: ubuntu-latest
     needs: build
     steps:
