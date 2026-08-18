@@ -18,10 +18,16 @@ on:
         required: false
         default: 'Release'
         type: string
+      environment:
+        description: 'Environment to deploy'
+        required: false
+        default: 'produccion'
+        type: string  
 
 jobs:
   extract-version:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     outputs:
       app_version: ${{ steps.extract_version.outputs.VERSION }}
     steps:
@@ -73,4 +79,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ inputs.artifactname }}     
+          name: ${{ inputs.artifactname }}
+      - name: Mostrar variable
+        run: echo "version en ${{ vars.VARIABLE_GITHUB }}"
