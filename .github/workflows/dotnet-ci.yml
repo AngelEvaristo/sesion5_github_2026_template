@@ -30,7 +30,9 @@ on:
       OIDC_AWS_ARN:
         description: 'AWS OIDC Role ARN'
         required: true       
-
+permissions:
+  id-token: write
+  contents: write
 env:
   LAMBDA_HEADER: 'sesion5_github_2026::sesion5_github_2026_Function::FunctionHandler'
   LAMBDA_RUNTIME: 'dotnet8'
@@ -149,7 +151,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.OIDC_AWS_ARN }}
           aws-region: us-east-1
-          
+
       - name: deploy lambda
         run: |
           aws lambda update-function-configuration --function-name ${{ vars.LAMBDA_NAME }} --handler ${{ env.LAMBDA_HEADER }} --runtime ${{ env.LAMBDA_RUNTIME }}
